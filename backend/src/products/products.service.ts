@@ -17,12 +17,30 @@ export class ProductsService {
         return this.prisma.product.findMany();
     }
 
-    findOne(id: number) {
-        return 'this.prisma.product.findFirst(id)';
+    async findOne(id: string) {
+        const product = await this.prisma.product.findUnique({
+            where: { id }
+        })
+
+        if (!product) {
+            throw new NotFoundException(`Produkt o ID ${id} nie zostal znaleziony.`);
+        }
+
+        return product;
     }
 
-    update(id: number, updateProductDto: UpdateProductDto) {
-        return 'this.prisma.product.update(id, updateProductDto)';
+    async update(id: string, data: UpdateProductDto) {
+        try {
+            return this.prisma.product.update({
+                where: { id },
+                data,
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new NotFoundException(`Produkt o ID ${id} nie istnieje i nie może zostać zaktualizowany.`);
+            }
+            throw error;
+        }
     }
 
     async remove(id: string) {
