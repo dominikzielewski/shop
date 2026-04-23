@@ -1,43 +1,151 @@
 generator client {
-  provider = "prisma-client-js"
-  // output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    // output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
+    provider = "postgresql"
 }
 
-enum OrderStatus {
-  PENDING
-  PAID
-  CANCELED
+enum UserRole {
+    ADMIN
+    MOD
+    USER
 }
+
+enum PaymentStatus {
+    PENDING
+    PAID
+    CANCELED
+}
+
+enum Status {
+    ACTIVE
+    INACTIVE
+    HIDDEN
+    DELETED
+}
+
+// USER
+
+model User {
+    id        String         @id @default(cuid())
+    email     String
+    password  String
+    firstName String
+    lastName  String
+    phone     String?
+    role      UserRole       @default(USER)
+    cartItems UserCartItem[]
+    orders    Order[]
+
+    createdAt DateTime @default(now())
+}
+
+model UserCartItem {
+    id        String         @id @default(uuid())
+    userId    String
+    user      User           @relation(fields: [userId], references: [id])
+    variantId String
+    variant   ProductVariant @relation(fields: [variantId], references: [id])
+    quantity  Int
+    createdAt DateTime       @default(now())
+
+    @@unique([userId, variantId])
+}
+
+// PRODUCT
 
 model Product {
-  id          String      @id @default(cuid())
-  name        String
-  description String?
-  price       Int
-  orderItems  OrderItem[]
+    id          String           @id @default(cuid())
+    name        String
+    description String?
+    image       String
+    status      Status           @default(ACTIVE)
+    variants    ProductVariant[]
+
+    productCategories ProductCategory[]
 }
 
+model ProductVariant {
+    id        String  @id @default(uuid())
+    name      String
+    price     Int
+    stock     Int     @default(0)
+    status    Status  @default(ACTIVE)
+    productId String
+    product   Product @relation(fields: [productId], references: [id])
+
+    userCartItems UserCartItem[]
+    orderItems    OrderItem[]
+}
+
+// CATEGORY
+
+model Category {
+    id                String            @id @default(uuid())
+    name              String            @unique
+    status            Status            @default(ACTIVE)
+    productCategories ProductCategory[]
+}
+
+model ProductCategory {
+    productId  String
+    categoryId String
+    product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+    category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+    @@id([productId, categoryId])
+}
+
+// ORDER
+
 model Order {
-  id              String      @id @default(cuid())
-  stripeSessionId String      @unique
-  customerEmail   String
-  totalAmount     Int
-  status          OrderStatus @default(PENDING)
-  items           OrderItem[]
-  createdAt       DateTime    @default(now())
+    id              String        @id @default(cuid())
+    stripeSessionId String        @unique
+    userId          String?
+    user            User?         @relation(fields: [userId], references: [id])
+    paymentStatus   PaymentStatus @default(PENDING)
+    shippedStatus   Boolean       @default(false)
+    totalAmount     Int
+    items           OrderItem[]
+
+    shippingMethodId String?
+    shippingMethod   ShippingMethod? @relation(fields: [shippingMethodId], references: [id])
+    shippingPoint    String?
+    country          String
+    city             String
+    postalCode       String
+    address          String
+    firstName        String
+    lastName         String
+    phone            String
+    email            String
+
+    createdAt DateTime @default(now())
 }
 
 model OrderItem {
-  id              String  @id @default(cuid())
-  nameAtPurchase  String
-  priceAtPurchase Int
-  quantity        Int
-  orderId         String
-  productId       String
-  order           Order   @relation(fields: [orderId], references: [id])
-  product         Product @relation(fields: [productId], references: [id])
+    id               String          @id @default(cuid())
+    nameAtPurchase   String
+    priceAtPurchase  Int
+    quantity         Int
+    orderId          String
+    order            Order           @relation(fields: [orderId], references: [id])
+    productVariantId String?
+    productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id])
+}
+
+// SHIPPING METHOD
+
+model ShippingMethod {
+    id       String  @id @default(uuid())
+    name     String
+    price    Int
+    status   Status  @default(ACTIVE)
+    isInPost Boolean @default(false)
+
+    orders Order[]
+
+    createdAt DateTime @default(now())
 }

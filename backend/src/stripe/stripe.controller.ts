@@ -11,8 +11,8 @@ export class StripeController {
     constructor(private readonly stripeService: StripeService) {}
 
     @Post('checkout')
-    createCheckout(@Body() createCheckoutDto: CreateCheckoutDto) {
-        return this.stripeService.createCheckoutSession(createCheckoutDto.items);
+    createCheckout(@Body() dto: CreateCheckoutDto) {
+        return this.stripeService.createCheckoutSession(dto);
     }
 
     @Post('webhook')

@@ -14,12 +14,15 @@ export class ProductsService {
     }
 
     findAll() {
-        return this.prisma.product.findMany();
+        return this.prisma.product.findMany({
+            include: { variants: true },
+        });
     }
 
     async findOne(id: string) {
         const product = await this.prisma.product.findUnique({
-            where: { id }
+            where: { id },
+            include: { variants: true },
         })
 
         if (!product) {

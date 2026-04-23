@@ -18,20 +18,41 @@ async function main() {
 
     const products = [
         {
-            name: 'Koszulka TypeScript',
-            description: 'Wysokiej jakości bawełniana koszulka z logo TS',
-            price: 9900,
+            name: 'Koszulka Programisty',
+            description: 'Najlepsza koszulka do pisania w NestJS',
+            image: 'https://via.placeholder.com/500',
+            variants: {
+                create: [
+                    { name: 'Rozmiar S', price: 10000, stock: 50 },
+                    { name: 'Rozmiar M', price: 12000, stock: 50 },
+                    { name: 'Rozmiar L', price: 13000, stock: 50 }
+                ]
+            }
         },
         {
-            name: 'Kubek Programisty (NestJS)',
-            description: 'Zwiększa produktywność o 200%',
-            price: 4500,
+            name: 'Koszulka RUST',
+            description: 'Koszulka programisty RUST',
+            image: 'https://via.placeholder.com/500',
+            variants: {
+                create: [
+                    { name: 'Rozmiar S', price: 10000, stock: 50 },
+                    { name: 'Rozmiar M', price: 12000, stock: 50 },
+                    { name: 'Rozmiar L', price: 13000, stock: 50 }
+                ]
+            }
         },
         {
-            name: 'Zestaw naklejek Prisma',
-            description: '5 holograficznych naklejek',
-            price: 1500,
-        }
+            name: 'Koszulka Full Stack Developer',
+            description: 'Pochwal sie ze jestes Full Stackiem',
+            image: 'https://via.placeholder.com/500',
+            variants: {
+                create: [
+                    { name: 'Rozmiar S', price: 10000, stock: 50 },
+                    { name: 'Rozmiar M', price: 12000, stock: 50 },
+                    { name: 'Rozmiar L', price: 13000, stock: 50 }
+                ]
+            }
+        },
     ];
 
     for (const productData of products) {
